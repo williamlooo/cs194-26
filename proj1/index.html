@@ -1,0 +1,59 @@
+<h1 id="project-1-colorizing-the-prokudin-gorskii-photo-collection">Project 1 - Colorizing the Prokudin-Gorskii photo collection</h1>
+<h2>By <a href="https://www.linkedin.com/in/williamlooo/" target="_blank">William Loo</a>, Fall 2020</h2>
+<br>
+<h2 id="background">Background</h2>
+<p>Around 1905, Prokudin-Gorsky envisioned and formulated a plan to use the emerging technological advances that had been made in color photography to document the Russian Empire systematically. Through such an ambitious project, his ultimate goal was to educate the schoolchildren of Russia with his &quot;optical color projections&quot; of the vast and diverse history, culture, and modernization of the empire <a href="https://en.wikipedia.org/wiki/Sergey_Prokudin-Gorsky">(Wikipedia)</a></p>
+<p>The Prokudin-Gorskii photo collection is the result of this work. The computer vision algorithm developed in this project aims reconstruct the color photographs by methodically combining the three color channels together. </p>
+<h2 id="process">Process</h2>
+<p> <img src="assets/red_emir.jpg" alt="red_emir"><img src="assets/green_emir.jpg" alt="green_emir"><img src="assets/blue_emir.jpg" alt="blue_emir"></p>
+<p>The software is required to find an optimal alignment that maximizes correlation between the red and blue channels, and then the green and blue channels. Finally, the three channels are combined into one image. The development of the algorithm was further improved through the following steps:</p>
+<ol>
+<li>Loss Metric Selection</li>
+<li>Image Pyramid</li>
+<li>Border Removal</li>
+</ol>
+<h3 id="loss-metric-selection">Loss Metric Selection</h3>
+<p>A few candidate metrics were evaluated: </p>
+<ul>
+<li>Sum Squared Differences (SSD, expressed as the total squared pixel intensity differences between two images.</li>
+<li><p>Zero Normalized Cross Correlation (ZNCC), calculated by normalizing the intensity differences between the pixel intensities of two images.</p>
+</li>
+<li><p>Structural Similarity Index Measure (SSIM), an advanced metric that utilizes comparison measurements in luminance, contrast and structure to quantify image quality degradation. Using additional measurements to lock down the error, as opposed to just pixel intensity comparisons help with tricky cases like the image of the emir.<br><img src="assets/ssim_img.png" alt="ssim_img"><br>src: cns.nyu.edu</p>
+</li>
+</ul>
+<br>
+<p><b>As a baseline metric, SSD was helpful in getting the initial results. Using SSIM produced the highest quality image, but Zero Normalized Cross Correlation proved to be the best tradeoff between quality and speed.</b></p>
+<br>
+<h3 id="image-pyramid">Image Pyramid</h3>
+<p>Initially performing an extensive search over the smallest scaled image, subsequent searches in upscaled images search in the upscaled zone between two pixels in the previous scale. This significantly reduces our search space in larger images, and quickly yields higher-quality results.</p>
+<h3 id="border-removal">Border Removal</h3>
+<p>During the process of matching images, the border contributes little to the final image, yet provides a constant source of distraction. For the matching process, the algorithm removes 20% from each side of the image, and performs the matching on the middle 60% of the image. </p>
+<h2 id="gallery">Gallery</h2>
+<p><img src="assets/arches.jpg" alt="arches"><br> Red: [24, 96] Green [8, 32]</p>
+<p><img src="assets/castle.jpg" alt="castle"><br> Red: [0, 96] Green [0, 32]</p>
+<p><img src="assets/cathedral.jpg" alt="cathedral"><br> Red: [2, 10] Green [2, 4]</p>
+<p><img src="assets/emir.jpg" alt="emir"><br> Red: [-200, 0] Green [24, 48] (see below for fixed version) </p>
+<p><img src="assets/harvesters.jpg" alt="harvesters"><br> Red: [16, 120] Green [16, 56]</p>
+<p><img src="assets/icon.jpg" alt="icon"><br> Red: [24, 88] Green [16, 40]</p>
+<p><img src="assets/lady.jpg" alt="lady"><br> Red: [8, 112] Green [8, 48]</p>
+<p><img src="assets/lake.jpg" alt="lake"><br> Red: [0, 6] Green [0, 2]</p>
+<p><img src="assets/melons.jpg" alt="melons"><br> Red: [16, 176] Green [8, 80]</p>
+<p><img src="assets/monastery.jpg" alt="monastery"><br> Red: [2, 2] Green [2, -4]</p>
+<p><img src="assets/onion_church.jpg" alt="onion_church"><br> Red: [36, 108] Green [24, 48]</p>
+<p><img src="assets/rocks.jpg" alt=rocks><br> Red: [-2, -2] Green [0, -4]</p>
+<p><img src="assets/self_portrait.jpg" alt="self_portrait"><br> Red: [40, 176] Green [32, 80]</p>
+<p><img src="assets/three_generations.jpg" alt="three_generations"><br> Red: [16, 112] Green [16, 48]</p>
+<p><img src="assets/tobolsk.jpg" alt="tobolsk"><br> Red: [4, 6] Green [2, 2]</p>
+<p><img src="assets/train.jpg" alt="train"><br> Red: [32, 88] Green [8, 40]</p>
+<p><img src="assets/workshop.jpg" alt="workshop"><br> Red: [0,56] Green [-8,104]</p>
+
+<h2 id="further-alignment-improvements">Further Alignment Improvements</h2>
+<p>The emir image has brightness differences in the green channel which proved tricky to properly align upon the blue channel. Alignment could be fixed by replacing the loss metric implementation with SSIM, or alternatively aligning the other two color layers on the green layer as opposed to the blue layer, with the green color layer's inconsistencies being broadcast across all layers being aligned: </p>
+SSIM Result:
+<p> <img src="assets/ssim_emir.jpg" alt="ssim_emir"><br> Red: [41, 106] Green [24, 48]</p>
+Color Layer Alignment Result on the Green Layer instead of the Blue Layer:
+<p> <img src="assets/shuffled_emir.jpg" alt="shuffled_emir"><br> Red: [16, 56] Blue [-24, -48]</p>
+
+<br>
+
+<p><i> Prepared for CS194-26, taught by Prof. Alexei (Alyosha) Efros, last updated 9/09/2020.</i></p>
