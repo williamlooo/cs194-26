@@ -1,0 +1,79 @@
+<h1 id="title1">Project 2 - Fun with Filters and Frequencies!</h1>
+<h2>By <a href="https://www.linkedin.com/in/williamlooo/" target="_blank">William Loo</a>, Fall 2020</h2>
+<br>
+
+<h2 id="part-1-1-finite-difference-operator">Part 1.1: Finite Difference Operator</h2>
+<p>Here are the partial derivatives applied to the input with respect to the x and y directions, using the finite difference operator [1,-1]:</p>
+<p><img src="assets/1_1_1.png" alt="1_1_1"></p>
+<p>The gradient magnitude is calculated by taking the square root of the sums of the squares of the partial derivatives. Binarization follows to show only edges which exceed a certain threshold. Behold:</p>
+<p><img src="assets/1_1_2.png" alt="1_1_2"></p>
+<h2 id="part-1-2-derivative-of-gaussian-dog-filter">Part 1.2: Derivative of Gaussian (DoG) Filter</h2>
+<p>We can improve the quality of the detected edges by denoising our input through the application of a gaussian filter. Here is the result after using a gaussian blur:</p>
+<p><img src="assets/1_2_2.png" width=1500 alt="1_2_2"></p>
+<p>We can do the same thing with a single convolution instead by creating a derivative of gaussian filter. We do this by convolving the gaussian filter with D_x and D_y (our finite difference operators from before) Here is what the resulting DoG filters looks like: </p>
+<p><img src="assets/1_2_1.png" alt="1_2_1"></p>
+<p>I verify that I get the same result as before below, as convolution operations are considered commutative and associative:</p>
+<p><img src="assets/1_2_3.png" width=1500 alt="1_2_3"></p>
+<h2 id="part-1-3-image-straightening">Part 1.3: Image Straightening</h2>
+<p>This part focuses on creating an algorithm to auto-straighten images. Statistically, straighter images have a preference for vertical and horizontal edges in most images (due to gravity!). </p>
+<p>The result of this section will be to maximize the number of vertical and horizontal edges. How this is achieved is by first rotating the input through a certain range of rotations. We then sample the middle 60% of the image and calculate the gradient angle of the gaussian blurred image using <code>arctan(dy/dx)</code>. </p>
+<p>With the gradient angles, we can proceed with evaluating the frequency of horizontal/straight edges using orientation histograms with bins of 2, and then choosing the one with the most vertical and horizontal edges. For example if we were looking for 90 degree gradients, we would search within a range of two bins, so within [88,92]. Here are the results:</p>
+<p>Facade:</p>
+<p><img src="assets/1_3_1.png" alt="facade"></p>
+<p>Facade Histograms:</p>
+<p><img src="assets/hist_facade_orig.jpg" alt="facade_orig">
+<img src="assets/hist_facade_best.jpg" alt="facade_best"></p>
+<p>City:</p>
+<p><img src="assets/1_3_3.png" alt="1_3_3"></p>
+<p>City Histograms:</p>
+<p><img src="assets/hist_city_orig.jpg" alt="city_orig">
+<img src="assets/hist_city_best.jpg" alt="city_best"></p>
+<p>Treat:</p>
+<p><img src="assets/1_3_4.png" alt="1_3_4"></p>
+<p>Treat Histograms:</p>
+<p><img src="assets/hist_treat_orig.jpg" alt="treat_orig">
+<img src="assets/hist_treat_best.jpg" alt="treat_best"></p>
+<p>Board:</p>
+<p><img src="assets/1_3_2.png" alt="1_3_2"></p>
+<p>Board Histograms:</p>
+<p><img src="assets/hist_board_orig.jpg" alt="board_orig">
+<img src="assets/hist_board_best.jpg" alt="board_best"></p>
+<p>Board can be considered to be one of the more difficult cases due to the angle of the image. There are some spikes in the histogram due to the relatively large swathes of plain background, further compounded through gaussian blurring and the lower resolution of the input. The &quot;straightened&quot; version of the image may not be actually straight in the perspective of the surrounding perspective, but at least our chalkboard is straight now!</p>
+<br>
+<h2 id="part-2-1-image-sharpening-">Part 2.1: Image &quot;Sharpening&quot;</h2>
+<p>Image sharpening was performed by subtracting an image from its gaussian blurred version to yield a sharpness mask, which is then added back to the original image:</p>
+<p><img src="assets/2_1_1.png" alt="taj"></p>
+<p><img src="assets/2_1_2.png" alt="yum"></p>
+<h2 id="part-2-2-hybrid-images">Part 2.2: Hybrid Images</h2>
+<p>To create hybrid images, I would use the low frequencies for one input and the high frequencies  for another input, and combine them together. A low-pass filter was applied using gaussian blur, and a high-pass filter was applied by subtracting out low frequencies from the second input image:</p>
+<p><img src="assets/2_2_1.png" alt="2_2_1"></p>
+<p>Below is the log magnitude of the fourier transforms for the two input images:</p>
+<p><img src="assets/fourier_1.jpg" alt="fourier_1"></p>
+<p><img src="assets/fourier_2.jpg" alt="fourier_2"></p>
+<p>Here are some more fun examples:</p>
+<p><img src="assets/2_2_2.png" alt="2_2_2"></p>
+<p><img src="assets/2_2_3.png" alt="2_2_3"></p>
+<p><img src="assets/2_2_4.png" alt="2_2_4"></p>
+<h2 id="part-2-3-gaussian-and-laplacian-stacks">Part 2.3: Gaussian and Laplacian Stacks</h2>
+<p>The Gaussian and Laplacian stacks represent incremental amounts of blurring. Each layer of the Gaussian stack is blurred more than the previous, and each layer of the Laplacian stack is the difference of the Gaussian stack at the current level and the one from the previous layer. Here are some results from Dali&#39;s painting:</p>
+
+<p><img src="assets/2_3_1.png" width=1500 alt="2_3_1"></p>
+<p><img src="assets/2_3_2.png"  width=1500 alt="2_3_2"></p>
+<p>The Gaussian and Laplacian stacks of a blended image from Part 2:</p>
+<p><img src="assets/2_3_3.png"  width=1500 alt="2_3_3"></p>
+<p><img src="assets/2_3_4.png"  width=1500 alt="2_3_4"></p>
+<h2 id="part-2-4-multiresolution-blending-a-k-a-the-oraple-">Part 2.4: Multiresolution Blending (a.k.a. the oraple!)</h2>
+<p>To perform image blending, a mask is used to differentiate the border between the two images. A gaussian stack is used on the mask to help smoothen the transitions between the two images. Two laplacian stacks, one for each input is needed. We use the following formula</p>
+<p><img src="https://piazza.com/redirect/s3?bucket=uploads&amp;prefix=paste%2Fjktvgyz2qiw5j6%2F3b5c64d52835ece1f4f99ab943180fc3358522e9cb628f0b03e782c95c27be84%2FScreen_Shot_2020-09-24_at_4.37.42_PM.png" alt="form"> </p>
+<p>to determine how to blend each image from the laplacian stacks, into one final laplacian stack. The layers of the final stack are combined to yield the blended images. Behold the oraple:</p>
+<p><img src="assets/2_4_1.png"  width=1500 alt="2_4_1"></p>
+<p>More examples:</p>
+<p><img src="assets/2_4_2.png"  width=1500 alt="2_4_2"></p>
+<p>For reference, here is what it looks like in each layer of the final laplacian stack:</p>
+<p><img src="assets/2_4_3.png"  width=1500 alt="2_4_3"></p>
+<p>and let's end with a meme application of this hard work:</p>
+<p><img src="assets/2_4_4.png"  width=1500 alt="2_4_4"></p>
+<h2 id="key-takeaways">Key Takeaways</h2>
+<p>It&#39;s very cool to implement the computational photography tools I often use when editing photos like smooth blending or masks. It gives me a good introduction to how software I previously saw to be like black boxes, like Photoshop are developed. </p>
+<p>I occasionally work on computer vision with ML applications, and this opportunity to understand how common library functions work has made me appreciate them in a new way.</p>
+<br>
