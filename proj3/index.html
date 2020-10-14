@@ -1,0 +1,42 @@
+<h1 id="title1">Project 3 - Face Morphing</h1>
+<h2>By <a href="https://www.linkedin.com/in/williamlooo/" target="_blank">William Loo</a>, Fall 2020</h2>
+<br>
+
+<h2 id="defining-correspondences">Defining Correspondences</h2>
+<p>I define correpondences by reusing the ginput tool used in project 2. Here is what the results look like after experimenting with different combinations of point correspondences in different locations. These sets of points appear to give the best results.</p>
+<p><img src="assets/george_keypoints.png" alt="george_keypts">
+<img src="assets/will_keypoints.png" alt="will_keypts"></p>
+<h2 id="midway-face">Midway Face</h2>
+<p>To compute the midway face, first I need to average the two sets of points, and transform the two input images to the average shape. The transformation is done by iterating through each of the triangles returned by the Delaunay triangulation algorithm, and transforming them as defined by mapping the starting and ending points (from the input images) to the triangle created from the halfway point. To do this, I would need to compute a affine transformation matrix to map the pixels within the triangles from the averaged points to the original image. After transformation, the two outputs are combined using a cross dissolve of 50-50 from both transformed outputs. </p>
+<p>Will, George:</p>
+<p><img src="assets/will.jpg" alt="will"> <img src="assets/george_small.jpg" alt="george">
+
+<p>Will+George:</p>
+<p><img src="assets/mid.jpg" alt="mid"></p>
+<p>Hopefully I age this well :').</p>
+
+<h2 id="morph-sequence">Morph Sequence</h2>
+<p>The morph sequence was performed by gradually increasing the warp factor (from 0 to 1) and cross dissolve to transition between one image to another.</p>
+<img src="assets/will-george.gif" alt="will_george_gif">
+<h2 id="mean-face-of-a-population">Mean Face of a Population</h2>
+<p>I used the images and keypoints from the IMM Face Database of Danish people (<a href="http://www2.imm.dtu.dk/~aam/datasets/datasets.html">http://www2.imm.dtu.dk/~aam/datasets/datasets.html</a>) to calculate the &quot;mean face&quot; of a population. I added dummy keypoints for the corners in addition to the provided keypoints, in order to retain the background...</p>
+<p><img src="assets/danish_points.png" alt="danish_points"></p>
+<p>Here is the mean face:</p>
+<p><img src="assets/avg.jpg" alt="avg"></p>
+<p>Here are some danish people morphed to the average face:</p>
+<p>Before and After Warping for 18:</p>
+<p><img src="assets/18-1m.jpg" alt="before"> <img src="assets/18-1m_tomean.jpg" alt="after"></p>
+<p>Before and After Warping for 34:</p>
+<p><img src="assets/34-1m.jpg" alt="before"> <img src="assets/34-1m_to_mean.jpg" alt="after"></p>
+<p>After:</p>
+<p>Here is my face warped into the mean geometry:</p>
+<p><img src="assets/will_as_a_danish.jpg" alt="will_danish"></p>
+<p>Here is the average face warped into my geometry:</p>
+<p><img src="assets/danish_as_will.jpg" alt="danish_will"></p>
+The more than usual distortion is the result of the positioning of the faces..
+<h2 id="caricature">Caricature</h2>
+<p>For the caricature, I adjusted the warp factor in a morphing process to be a value above 1 and below 0, or outside the bounds of [0,1]. Here is the result of warping to -0.7 and 1.3 respectively. (rip jawline)</p>
+<p><img src="assets/will_caricature_1.jpg" alt="cari_1"><img src="assets/will_caricature_2.jpg" alt="cari_two"></p>
+<h2 id="class-morph">Class Morph</h2>
+<p>I joined a group of students to create a class morph: (<a href="https://www.youtube.com/watch?v=O3vouduLS3w">https://www.youtube.com/watch?v=O3vouduLS3w</a>)</p>
+
