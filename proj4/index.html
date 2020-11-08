@@ -1,0 +1,62 @@
+<h1 id="title-">Title:</h1>
+<h2>By <a href="https://www.linkedin.com/in/williamlooo/" target="_blank">William Loo</a>, Fall 2020</h2>
+<br>
+
+<h2 id="part-1-nose-tip-detection">Part 1: Nose Tip Detection</h2>
+<p>Here are some images visualized with ground truth keypoints:</p>
+<p><img src="assets/1_1.png" alt="1_1">
+<img src="assets/1_2.png" alt="1_2"></p>
+<p><img src="assets/1_3.png" alt="1_3">
+<img src="assets/1_4.png" alt="1_4"></p>
+<p>A neural network (NoseNet) was developed to detect these nose keypoints. NoseNet uses 4 convolutional layers followed by two fully connected layers. The activation function used is ReLU. The loss metric used is MSE. Here is the averaged loss plotted per epoch. Blue is training loss, Orange is validation loss.</p>
+<p><img src="assets/part_1_loss.png" alt="loss_1"></p>
+<p>The final training loss is 0.00380 and validation loss is 0.00505.</p>
+<p>Here are some cases where the nose detection was successful. Red is predicted, green is ground truth:</p>
+<p><img src="assets/1_5.png" alt="1_5">
+<img src="assets/1_6.png" alt="1_6"></p>
+<p>Here are some cases where NoseNet wasn&#39;t as successful. Red is predicted, green is ground truth:</p>
+<p><img src="assets/1_7.png" alt="1_7">
+<img src="assets/1_8.png" alt="1_8"></p>
+<p>Face angle and variable lighting conditions played a factor into the accuracy of the network. Faces that were tilted far to the right or left often had their nose points in the wrong place. Also strange specks of light may cause NoseNet to identify these areas as noses.</p>
+<h2 id="part-2-full-facial-keypoints-detection">Part 2: Full Facial Keypoints Detection</h2>
+<p>Here are some sampled images with their ground truth facial keypoints:</p>
+<p><img src="assets/2_1.png" alt="2_1">
+<img src="assets/2_2.png" alt="2_2"></p>
+<p><img src="assets/2_3.png" alt="2_3">
+<img src="assets/2_4.png" alt="2_4"></p>
+<p>As we see above, there are many more points to predict. To help with the training process, some augmentation techniques were to sample facial angles of 3,4,6 (left/right tilted faces / wildcard angles) 4x more often so the network has more opportunities to learn from angled faces. Vertical shifting was implemented as well using np.roll (which can be seen in some images above).</p>
+<p>The architecture consists of 5 convolutional layers, and two fully connected layers. The activation function used is ReLU. </p>
+<p>The training process is performed for 30 epochs with a batch size of 8. The learning rate is initially set to 0.0001 and is reduced at 20 epochs to 0.00005. </p>
+<p>Here is the plotted training/validation loss per epoch. The blue is training loss and orange is validation loss. The training loss is 0.00373 and validation loss is 0.00479.</p>
+<p><img src="assets/part_2_loss.png" alt="loss_2"></p>
+<p>Here are two cases where the facial keypoints are detected correctly. Red is predicted and green is ground truth:</p>
+<p><img src="assets/2_5.png" alt="2_5">
+<img src="assets/2_6.png" alt="2_6"></p>
+<p>Here are two cases where the facial keypoints are not detected correctly. Red is predicted and green is ground truth:</p>
+<p><img src="assets/2_7.png" alt="2_7">
+<img src="assets/2_8.png" alt="2_8"></p>
+<p>The accuracy of these cases are likely reduced due to color contrast inconsistencies and extreme facial angles which may have occluded the keypoints.</p>
+<p>Finally, we visualize the learned filters:</p>
+<p>First Layer</p>
+<p><img src="assets/2_9.png" alt="2_9"></p>
+
+<h2 id="part-3-train-with-larger-dataset">Part 3: Train With Larger Dataset</h2>
+<p>Here are some sampled images with the ground truth keypoints:</p>
+<p><img src="assets/3_1.png" alt="3_1">
+<img src="assets/3_2.png" alt="3_2"></p>
+<p><img src="assets/3_3.png" alt="3_3">
+<img src="assets/3_4.png" alt="3_4"></p>
+<p>The network architecture is the same as that of ResNet18, with the size of the input and output layers adjusted to accommodate the input and output images. </p>
+<p>Training was performed over 20 epochs, with a batch size of 6 and initial learning rate of 0.0001 which is changed to 0.00001 at 10 epochs. </p>
+<p>Here is a plot of the training and validation loss. Blue is training loss and orange is validation loss. The training loss is 0.00517 and the validation loss is 0.00559. I got a MAE of 46.76 on the Kaggle challenge.</p>
+<p><img src="assets/part_3_loss.png" alt="loss_3"></p>
+<p>Here are some predictions from the test set:</p>
+<p><img src="assets/3_5.png" alt="3_5">
+<img src="assets/3_6.png" alt="3_6">
+<img src="assets/3_7.png" alt="3_7">
+<img src="assets/3_8.png" alt="3_8"> </p>
+<p>Here are some results from my photo collection. The net seems to work well on images which are less noisy, and have square bounding boxes which reveal as much as their face as possible. Sources of failure seem to be attributed to pictures of people without glasses, and also where the face takes up a smaller part of the image.</p>
+<p><img src="assets/3_9.png" alt="3_9">
+<img src="assets/3_10.png" alt="3_10">
+<img src="assets/3_11.png" alt="3_11">
+<img src="assets/3_12.png" alt="3_12"></p>
