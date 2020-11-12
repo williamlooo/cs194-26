@@ -24,8 +24,8 @@
 <img src="assets/2_2.png" alt="2_2"></p>
 <p><img src="assets/2_3.png" alt="2_3">
 <img src="assets/2_4.png" alt="2_4"></p>
-<p>As we see above, there are many more points to predict. To help with the training process, some augmentation techniques were to sample facial angles of 3,4,6 (left/right tilted faces / wildcard angles) 4x more often so the network has more opportunities to learn from angled faces. Vertical shifting was implemented as well using np.roll (which can be seen in some images above).</p>
-<p>The architecture consists of 5 convolutional layers (first three layers have kernel sizes of 3 and last two layers have kernel sizes of 5, and two fully connected layers. The activation function used is ReLU. </p>
+<p>As we see above, there are many more points to predict. To help with the training process, some augmentation techniques were to sample facial angles of 3,4,6 (left/right tilted faces / wildcard angles) 4x more often so the network has more opportunities to learn from angled faces. Vertical and horizontal shifting was implemented as well using np.roll (which can be seen in some images above).</p>
+<p>The architecture consists of 5 convolutional layers of increasing dimensions and two fully connected layers. The first three layers have kernel sizes of 3 and last two layers have kernel sizes of 5. The activation function used is ReLU. </p>
 <p>The training process is performed for 30 epochs with a batch size of 8. The learning rate is initially set to 0.0001 and is reduced at 20 epochs to 0.00001. </p>
 <p>Here is the plotted training/validation loss per epoch. The blue is training loss and orange is validation loss. The training loss is 0.00373 and validation loss is 0.00479.</p>
 <p><img src="assets/part_2_loss.png" alt="loss_2"></p>
@@ -46,11 +46,11 @@
 <img src="assets/3_2.png" alt="3_2"></p>
 <p><img src="assets/3_3.png" alt="3_3">
 <img src="assets/3_4.png" alt="3_4"></p>
-<p>The network architecture is the same as that of ResNet18, with the size of the input and output layers adjusted to accommodate the input and output images. The input size is equal to batch size and the output size is equal to batch size multiplied by 136, which is 816 for a batch size of 6.</p>
-<p>Training was performed over 20 epochs, with a batch size of 6 and initial learning rate of 0.0001 which is changed to 0.00001 at 10 epochs. This learning rate adjustment was helpful for training.</p>
-<p>Here is a plot of the training and validation loss. Blue is training loss and orange is validation loss. The training loss is 0.00517 and the validation loss is 0.00559. I got a MAE of approximately 46.76 on the Kaggle challenge.</p>
+<p>The network architecture is the same as that of ResNet18, with the size of the input and output layers adjusted to accommodate the input and output images. The input size is equal to batch size, which is 6, and the output size is equal to batch size multiplied by 136, which is 816 for a batch size of 6.</p>
+<p>Training was performed over 50 epochs, with a batch size of 6 and initial learning rate of 0.001 which is changed to 0.0001 at 10 epochs. This learning rate adjustment was helpful for training.</p>
+<p>Here is a plot of the training and validation loss. Blue is training loss and orange is validation loss. The training loss is 0.00318 and the validation loss is 0.00325.</p>
 <p><img src="assets/part_3_loss.png" alt="loss_3"></p>
-<p>Here are some predictions from the test set. It appears the predictions have the right general idea of where the face is, but struggles to fit to faces with different angles. Also the eye points seem to be confusedd with the eyebrows for some reason. I suspect that this may be a data ingestion issue. </p>
+<p>Here are some predictions from the test set. It appears the predictions have the right general idea of where the face is, but struggles to fit to faces with different angles. Also the eye points seem to be confusedd with the eyebrows for some reason. I suspect that this may be a data ingestion issue. I got a MAE of approximately 24.155 on the Kaggle challenge.</p>
 <p><img src="assets/3_5.png" alt="3_5">
 <img src="assets/3_6.png" alt="3_6">
 <img src="assets/3_7.png" alt="3_7">
