@@ -1,0 +1,67 @@
+<h1 id="project-5">Project 5</h1>
+<p>William Loo</p>
+<h2 id="shoot-the-pictures">Shoot the Pictures</h2>
+<p>Some pictures were shot with a similar view and common points of interest. Here are two pictures that I am starting with.</p>
+<p><img src="assets/1_1.jpg" alt="1_1"> <img src="assets/1_2.jpg" alt="1_2"></p>
+<p><img src="assets/1_3.jpg" alt="1_3"> <img src="assets/1_4.jpg" alt="1_4"></p>
+<p><img src="assets/1_5.jpg" alt="1_5"> <img src="assets/1_6.jpg" alt="1_6"></p>
+<h2 id="recover-homographies">Recover Homographies</h2>
+<p>Before warping the images together, I need to recover the homography transformation between points in this image. Here is an example showing where I placed my keypoints for now. </p>
+<p><img src="assets/2_1.jpg" alt="2_1"> <img src="assets/2_2.jpg" alt="2_2"></p>
+<p><img src="assets/2_3.jpg" alt="2_1"> <img src="assets/2_4.jpg" alt="2_2"></p>
+<p><img src="assets/2_5.jpg" alt="2_1"> <img src="assets/2_6.jpg" alt="2_2"></p>
+<p>To recover the homography, I used the least squares approach to best match the transformation to the points.</p>
+<p><img src="assets/2_7.png" alt="2_7"></p>
+In particular the below formula helped me generate the A (2Nx8) and b (2Nx1) marices in order to get the H matrix.
+<p><img src="assets/2_8.jpg" alt="2_8"></p>
+<h2 id="warp-the-images">Warp the Images</h2>
+<h3 id="image-rectification">Image Rectification</h3>
+<p>In order to ensure that the homography is working, I did some rectification operations on sample images to view selected planes in the frontal-parallel plane, meaning the plane is warped into a rectangle. Here are some examples:</p>
+<p><b>Rectify to Cal Flag.</b></p>
+<p><img src="assets/2_1.jpg" alt="2_1"> <img src="assets/3_1.jpg" alt="3_1"></p>
+<p><b>Rectify to Chalk Board.</b></p>
+<p><img src="assets/3_2.jpg" alt="3_2"> <img src="assets/3_3.jpg" alt="3_3"></p>
+<p><b>Rectify to Power Transformer.</b></p>
+<p><img src="assets/1_6.jpg" alt="1_6"> <img src="assets/3_4.jpg" alt="3_4"></p>
+<br>
+<h3 id="blend-into-mosaic">Blend into Mosaic</h3>
+<p>With warping working as expected, the next goal is  to blend two images into a mosaic. The procedure is as follows after taking the homography:</p>
+<ol>
+<li>Calculate the resulting bounds of the final image with homography applied, and create a canvas.</li>
+<li>filter out of range values from homography result</li>
+<li>paste over the new image on canvas</li>
+<li>blend image using a linear alpha gradient, starting at 50% of the width of the first image, and then linearly decreasing the alpha afterwards. This could be tricky to determine without autostitching, because this depends on how much the images actually overlap.</li>
+<li>combine first and second image on canvas</li>
+</ol>
+<p>Here are some results of blending the source images from above:</p>
+<p><img src="assets/pano_1.jpg" alt="pano_1"></p>
+<p><img src="assets/pano_2.jpg" alt="pano_2"></p>
+<p><img src="assets/pano_3.jpg" alt="pano_3"></p>
+<p><img src="assets/pano_4.jpg" alt="pano_4"></p>
+There were some color differences due to lighting differences from different angles, so there were some sharp edges observed if insufficient care was put into selecting the right keypoints. The last mosaic of the street had many noninteresting features where I wasn't sure where to place the points, so let's improve the result (hopefully) by using automatic keypoint selection.
+<br>
+<h2 id="cool-takeaways">Cool Takeaways</h2>
+<p>It was tough at first trying to wrap my head around how a homography is derived, but the result of understanding how correspondence points can create image transformations. I first noticed an application of homographies on 360 degree backup camera systems for some high-end cars, and now I understand how they are created.</p>
+<h2 id="part-ii">Part II</h2>
+<p>In this section, I implement automatic keypoint selection based on <a href="https://inst.eecs.berkeley.edu/~cs194-26/fa20/hw/proj5/Papers/MOPS.pdf" title="MOPS Paper">Multi-Image Matching using Multi-Scale Oriented Patches” by Brown et al.</a></p>
+<h2 id="harris-interest-point-detector">Harris Interest Point Detector</h2>
+<p>Here is the result of running the Harris corner detection algorithm on an input image:</p>
+<p><img src="assets/4_1.jpg" alt="4_1"></p>
+<h2 id="adaptive-non-maximal-suppression">Adaptive Non-maximal Suppression</h2>
+<p>The above image looks a bit crowded doesn&#39;t it? This is where Adaptive Non-maximal Suppression (ANMS) comes in. As the MOPS paper mentions, the computational cost of matching points is superlinear in the number of interest points, so I can use ANMS to narrow down the number of interest points. The aim is to have only the strongest interest points, evenly distributed across the image. I compute the suppression radius for each point, and then sort the points by the radius and then take the top 500 interest points. Here is the result:</p>
+<p><img src="assets/4_2.jpg" alt="4_2"></p>
+<h2 id="feature-descriptor-extraction">Feature Descriptor Extraction</h2>
+<p>With less points, I can start sampling feature descriptors. I cut out 40x40 patches of the image centered around the interest points from above, downsample and normalize them into 8x8 axis aligned patches. Here is what a feature descriptor looks like: </p>
+<p>Here is the result of what a feature descriptor looks like: </p>
+<p><img src="assets/4_3.jpg" alt="4_3"></p>
+<h2 id="feature-matching">Feature Matching</h2>
+<p>Finally, I match these features by taking the distance between every pair of feature samples. I can then find the nearest neighbor from the second set of features for the first set of features. I then compare the ratios between the distances of the two closest neighbors to perform outlier rejection. If the ratio is less than 0.5 then I move the point forward. Below is where the points end up after matching and filtering for one mosaic: </p>
+<p><img src="assets/4_4.jpg" alt="4_4"><img src="assets/4_5.jpg" alt="4_5"></p>
+<h2 id="ransac">RANSAC</h2>
+<p>All of the steps above were really used to reduce the computational time of applying RANSAC. With a few strong candidates, I randomly sample 4 points using 4-point RANSAC over 1000 iterations. In each step, I compute a homography matrix using these 4 sample points and then apply the homography over all of the candidate points from the earlier part. I then count the points for which the error between the ground truth and estimated is less than 0.5, and if it is less, I count them as an inlier. After doing this sampling, I take the set of inliers and use them to calculate the (assumedly best) homography for warping. </p>
+<p>Here are some results between manual and automatic keypoint selection (manual on left, auto on right). The result of the difficult case of the last mosaic is indeed improved with automatic keypoint selecion (note the less jarring blending). </p>
+<p><img src="assets/5_1.jpg" alt="5_1"><img src="assets/5_2.jpg" alt="5_2"></p>
+<p><img src="assets/5_3.jpg" alt="5_3"><img src="assets/5_3.jpg" alt="5_4"></p>
+<p><img src="assets/5_5.jpg" alt="5_5"><img src="assets/5_6.jpg" alt="5_6"></p>
+<h2 id="lessons-learned">Lessons Learned</h2>
+<p>Given a pile of image data it&#39;s potentially expensive and difficult to sift through it all manually to find features. I found the part where I had to manually take patches and downsample them to be the most interesting because at that point I realized that this process of filtering harris corners will have a great impact on improving performance of feature detection automatically. </p>
