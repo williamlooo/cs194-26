@@ -1,0 +1,67 @@
+<h1 id="final-project">Final Project</h1>
+<p>William Loo</p>
+<h1 id="final-project-1-light-field-camera">Final Project 1: Light Field Camera</h1>
+<p>In this project, I used light field image data from the <a href="http://lightfield.stanford.edu/lfs.html">The Stanford Light Field Archive</a> to achieve depth refocusing and aperture adjustment . The implementation of this project draws inspiration from <a href="http://graphics.stanford.edu/papers/lfcamera/lfcamera-150dpi.pdf">this paper</a>.</p>
+<h3 id="depth-refocusing">Depth Refocusing</h3>
+<p>To achieve depth refocusing, I first experiment by shifting the images by a pair of x,y shifting value determined by the first two values in the filenames of the data provided by the lightfield archive, and average the images together.</p>
+<p>By multiplying a scaling value to the x,y shifts from the filename, and then combining all the shifted images together. I can achieve depth refocusing and create images with clarity on certain depths in the scene. For every depth refocusing operation, I use all of the images provided by the data.</p>
+<p>Here are a few refocusing examples using a set of images of a chessboard from the lightfield data:
+(from left to right: REFOCUSED FAR (scale=0), REFOCUSED MIDDLE (scale=1.6), REFOCUSED NEAR (scale= 3.2)) </p>
+<img src="assets/far.jpg" alt="far">
+<img src="assets/mid.jpg" alt="mid">
+<img src="assets/close.jpg" alt="close">
+<p>Here are three GIFs depicting the results of depth refocusing from back to front:</p>
+<p><img src="assets/refocus_chess.gif" alt="chess"></p>
+<p>^ scale: [0 , 3]</p>
+<p><img src="assets/refocus_beans.gif" alt="beans"></p>
+<p>^ scale: [-5 , 1]</p>
+<p><img src="assets/refocus_flower.gif" alt="flower"></p>
+<p>^ scale: [-2 , 3]</p>
+<h3 id="aperture-adjustment">Aperture Adjustment</h3>
+<p>From our previous observations, combining images together allows us to focus on which areas to highlight or blur, since objects far away from the camera do not vary their position significantly when the camera moves around while keeping the optical axis direction unchanged. To perform aperture adjustment, I choose a radius value used to select which photos are used in the averaging, and the resulting combined images will simulate different aperture values. </p>
+<p>In terms of how the radius value is used, candidate images are selected based on the x,y shift values from center mentioned in the previous section, and if the x,y shift values from the center of the image is within the radius I chose, it will be selected to be combined with other images satisfying this criteria to create the image with a simulated aperture. The simulated apertures may cause the center of the image to blur, because the different apertures will all focus on where the starting location of the grid would be (this is where the focus was when we combined all of the shifted images with scale=0 in the previous section). For chess, the focus for all apertures will be at the top portion of the image.</p>
+<p>Here are some results:</p>
+<p><img src="assets/aperture_chess.gif" alt="aperture_chess"></p>
+<p><img src="assets/aperture_beans.gif" alt="aperture_beans"></p>
+<p><img src="assets/aperture_flower.gif" alt="aperture_flower"></p>
+<h3 id="conclusion">Conclusion</h3>
+<p>This project was fascinating because it taught me to look under the hood of yet another computational photography method that I&#39;ve seen before. </p>
+<p>In the Portrait mode feature of the iPhone camera, the aperture could be digitally adjusted like I just did in this project.</p>
+<h3 id="bells-whistles">Bells &amp; Whistles</h3>
+<p>I attempted to generate my own set of images to be used with my refocus and aperture simulation. I took 9 pictures with even shifts horizontally and vertically. Here is what they look like: </p>
+<p><img src="assets/1.jpg" alt="1"> <img src="assets/2.jpg" alt="2"> <img src="assets/3.jpg" alt="3"></p>
+<p><img src="assets/4.jpg" alt="4"> <img src="assets/5.jpg" alt="5"> <img src="assets/6.jpg" alt="6"></p>
+<p><img src="assets/7.jpg" alt="7"> <img src="assets/8.jpg" alt="8"> <img src="assets/9.jpg" alt="9"></p>
+<p>Here are the results of the refocus and aperture simulation:</p>
+<p><img src="assets/refocus_desk.gif" alt="refocus_desk"></p>
+<p><img src="assets/aperture_desk.gif" alt="aperture_desk"></p>
+<p>I attribute the apparent failure to misaligned images. A gantry was used in the original lightfield data I used above, which allowed for precise measurements. In this case I didn&#39;t have a gantry but used a tripod to the best of my abilities. Many more images to the order of 289 images may be needed to properly perform the adjustment, instead of 9 images. </p>
+<br>
+
+<h1 id="final-project-2-poor-man-s-augmented-reality">Final Project 2: Poor Man&#39;s Augmented Reality</h1>
+<h3 id="setup">Setup</h3>
+<p>I start with a video of a box with some evenly spaced points. </p>
+<p><img src="assets/2_1.gif" alt="input"> </p>
+<h3 id="keypoints-with-known-3d-world-coordinates">Keypoints with known 3D world coordinates</h3>
+<p>I manually record the location of 50 keypoints in the first frame of the video along with their corresponding 3D world coordinates. Shown below are the locations of the keypoints along with the axes used to determine x,y,z positions. The origin (0,0,0) is marked in red, at the intersection of the axes. All points are 1 unit apart from each other in 3D world coordinates.</p>
+<p><img src="assets/axes.png" alt="axes"></p>
+<h3 id="propagating-keypoints-to-other-images-in-the-video-and-projecting-a-cube">Propagating Keypoints to other Images in the Video and Projecting a Cube</h3>
+<p>I used the MedianFlow tracker, <a href="https://www.learnopencv.com/object-tracking-using-opencv-cpp-python/">as detailed in this article</a>, and as suggested by the project spec. The bounding box size used by the tracker is 20px. Here are the results of tracking and propagating the keypoints to the other frames of the video.</p>
+<p><img src="assets/median_keypoints.gif" alt="med_points"> </p>
+<p>I project a cube with vertices defined at (1,1,2), (1,2,2), (2,2,2), (2,1,2), (1,1,3), (1,2,3),(2,2,3), (2,1,3). I take these vertices and convert them from 3D world coordinates into camera pixel positions using a camera projection matrix. The camera projection matrix was calculated using a least squares technique between the normalized camera pixel coordinates and the normalized 3D world coordinates. Here are the results of projecting the cube.</p>
+<p><img src="assets/median_cube.gif" alt="med_cube"></p>
+<h3>The results appear suboptimal, so read on for improvements: </h3>
+<p>The problem seen appears to be attributed to the tracker (see how the bounding boxes explode near the end). I read further about the MedianFlow tracker and learned that while it has good runtime and excellent tracking where the motion is well defined and when the scene has no occlusion, this seems to suggest that MedianFlow is meant for videos recorded in more strictly controlled environments.</p>
+<p>I recorded the video without a gimbal and without post-processing, so the camera shakes a bit. More notable is the fact that an entire plane of points on one side of the box gets occluded after the camera pans a bit too far near the end of the video. Soon after that surface is occluded is when the bounding boxes exploded. </p>
+<p>I experimented with a few more trackers, with the criteria that it should perform well despite occlusions, variable lighting, and the placement of identical features next to each other. I selected the <a href="https://arxiv.org/abs/1611.08461">CSR (Discriminative Correlation Filter with Channel and Spatial Reliability) Tracker</a>, which uses a spatial reliability map to improve the tracking. It does have a longer runtime, but the results are more stable and robust to occlusion. </p>
+<p>To further strengthen my implementation, I performed some keypoint filtering if the bounding boxes for a keypoint gets too large or if the keypoints can no longer be tracked. After filtering, only the keypoints (and their corresponding 3D coordinates) which satisfy the tracking and precision metrics are used in the calculation of the camera projection matrix. This improved the performance of the AR projection because any outliers would have been removed.</p>
+<p>Here are the results with improvements implemented:</p>
+<p><img src="assets/csrt_keypoints.gif" alt="csrt_points"> <img src="assets/csrt_cube.gif" alt="csrt_cube"></p>
+<h2>✨ Final Result ✨</h2>
+<p><img src="assets/final.gif" alt="final"></p>
+<h2 id="reflection">Reflection</h2>
+<p>It&#39;s also cool to once again learn about the inner workings of a well-known feature we've enjoyed before, like Snapchat&#39;s AR filters feature.</p>
+<p>This was my favorite project because the resulting projection was responsive to real-world changes in camera movement and gave me many ideas for improvement, but honestly all of the projects I&#39;ve worked on this semester have been my favorite at some point.</p>
+<p>In closing, I enjoyed this opportunity to take CS194-26, as it has prepared me well by giving me and idea of topics to explore in graduate studies, as well as provide a foundation on which to learn for the future.</p>
+<br>
+
