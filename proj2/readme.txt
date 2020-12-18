@@ -11,4 +11,4 @@ part 2: call 'python hybrid_image_starter.py' to run code for 2.2 - 2.4
 When run, the software will output images generated for your viewing convenience, in accordance with the project spec.
 These outputs will be labeled by their corresponding section, and will be in order of progress through the project spec and website
 
-REPORT: https://inst.eecs.berkeley.edu/~cs194-26/fa20/upload/files/proj2/cs194-26-acx
+REPORT: https://inst.eecs.berkeley.edu/~cs194-26/fa20/upload/files/proj2/cs194-26-acx 
