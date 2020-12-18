@@ -6,3 +6,5 @@ To generate results from input video, run 'python3 main.py'.
 * to reselect points, delete points.p, and delete points_3D
 
 opencv_contrib is required to run main.py
+
+REPORT: https://inst.eecs.berkeley.edu/~cs194-26/fa20/upload/files/projFinalAssigned/cs194-26-acx/
