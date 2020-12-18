@@ -8,4 +8,4 @@ Adding the --manual flag will run the code with manual keypoint selection. You w
 
 HOW TO CHANGE INPUT IMAGES: Adjust IM_1_NAME and IM_2_NAME variables on line 285/286 in main.py
 
-REPORT: https://inst.eecs.berkeley.edu/~cs194-26/fa20/upload/files/proj5B/cs194-26-acx/
+REPORT: https://inst.eecs.berkeley.edu/~cs194-26/fa20/upload/files/proj5B/cs194-26-acx
